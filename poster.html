@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meet2Map: AI-Powered Meeting Transcription to Mind Map System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Spectral:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind = {
+        config: {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['"Google Sans"', "sans-serif"],
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap");
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      * {
+        font-family: "Times New Roman", Times, serif !important;
+      }
+
+      :root {
+        --primary: #181a1f;
+        --accent: #1f7a8c;
+        --accent-light: rgba(31, 122, 140, 0.12);
+        --accent-medium: rgba(31, 122, 140, 0.2);
+        --green: #1b8a5a;
+        --orange: #d97706;
+        --gray: #5f6875;
+        --light-gray: #f6f8fb;
+        --paper: #ffffff;
+      }
+
+      body {
+        background: var(--paper);
+        color: var(--primary);
+        overflow: auto;
+        /* min-height: 100vh; */
+        position: relative;
+      }
+
+      .poster {
+        display: grid;
+        grid-template-columns: 0.9fr 2.2fr 0.9fr;
+        grid-template-rows: auto 1fr;
+        min-height: auto;
+        padding: 0.8rem;
+        gap: 0.6rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .badge {
+        position: absolute;
+        top: 0.9rem;
+        right: 0.9rem;
+        padding: 0.35rem 0.6rem;
+        border: 1px solid var(--accent);
+        background: var(--accent-light);
+        color: var(--accent);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        z-index: 10;
+      }
+
+      .header {
+        grid-column: 1 / -1;
+        border-bottom: none;
+        padding-bottom: 0;
+        position: relative;
+        gap: 0 !important;
+      }
+
+      .title-div {
+        top: 180px !important;
+        position: absolute;
+      }
+
+      .top-identity {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 0.45rem;
+      }
+
+      .logo-wrap {
+        width: 62px;
+        height: 62px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .logo-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .institution-details {
+        text-align: center;
+      }
+
+      .college-name {
+        font-size: 0.98rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: 0.01em;
+        color: #000000;
+      }
+
+      .dept-name {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+        color: #000000;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 0.16rem;
+        font-weight: 600;
+      }
+
+      .people-line {
+        margin-top: 0.24rem;
+        font-size: 0.67rem;
+        color: #000000;
+        line-height: 1.35;
+      }
+
+      .title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.2rem;
+        color: var(--primary);
+      }
+
+      .subtitle {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--gray);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .left-col,
+      .center-col,
+      .right-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        overflow: hidden;
+      }
+
+      .section {
+        background: var(--paper);
+        border: 1px solid #e2e8f0;
+        border-left: 3px solid var(--accent);
+        padding: 0.5rem;
+        box-shadow: 0 1px 3px rgba(24, 26, 31, 0.05);
+        transition: all 0.3s ease;
+      }
+
+      .section:hover {
+        box-shadow: 0 4px 12px rgba(31, 122, 140, 0.12);
+        transform: translateY(-2px);
+      }
+
+      .section-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        margin-bottom: 0.3rem;
+        font-weight: 600;
+      }
+
+      .section-content {
+        font-size: 0.68rem;
+        line-height: 1.35;
+      }
+
+      .highlight-box {
+        background: var(--accent-light);
+        border-left: 3px solid var(--accent);
+        padding: 0.55rem;
+        margin-top: 0.45rem;
+        font-size: 0.68rem;
+        font-weight: 600;
+      }
+
+      .metric-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.7rem;
+        margin-top: 0.4rem;
+      }
+
+      .metric {
+        text-align: center;
+        padding: 0.6rem;
+        background: var(--light-gray);
+        border-left: 3px solid var(--accent);
+      }
+
+      .metric-value {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .metric-label {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--gray);
+        margin-top: 0.2rem;
+      }
+
+      .workflow {
+        background: #f3fbfd;
+        border: 2px solid var(--accent);
+        padding: 0.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .workflow-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--accent);
+        position: relative;
+        z-index: 1;
+      }
+
+      .architecture-layers {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+        position: relative;
+        z-index: 1;
+      }
+
+      .layer {
+        background: var(--paper);
+        border: 1px solid var(--accent);
+        padding: 0.5rem;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .layer-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.62rem;
+        font-weight: 600;
+        color: var(--accent);
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .layer-content {
+        font-size: 0.62rem;
+        line-height: 1.38;
+        color: var(--primary);
+      }
+
+      .layer-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.28rem;
+        margin-top: 0.32rem;
+      }
+
+      .pill {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.5rem;
+        padding: 0.15rem 0.38rem;
+        background: var(--accent-light);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        border-radius: 2px;
+        font-weight: 600;
+      }
+
+      .layer-connector {
+        position: absolute;
+        left: 50%;
+        bottom: -0.3rem;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 0.3rem;
+        background: var(--accent);
+      }
+
+      .layer:last-child .layer-connector {
+        display: none;
+      }
+
+      .future-strip {
+        margin-top: 0.45rem;
+        border-top: 1px solid var(--accent-medium);
+        padding-top: 0.4rem;
+      }
+
+      .impact-inline {
+        margin-top: 0.4rem;
+        padding: 0.38rem 0.42rem;
+        border: 1px solid var(--accent-medium);
+        background: #f8fcff;
+        border-radius: 2px;
+      }
+
+      .impact-inline-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.56rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--accent);
+        margin-bottom: 0.2rem;
+        font-weight: 600;
+      }
+
+      .impact-inline-content {
+        font-size: 0.6rem;
+        line-height: 1.35;
+        color: var(--primary);
+      }
+
+      .future-strip-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.56rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--accent);
+        margin-bottom: 0.28rem;
+        font-weight: 600;
+      }
+
+      .future-items {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.28rem;
+      }
+
+      .future-item {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.5rem;
+        line-height: 1.3;
+        padding: 0.22rem 0.3rem;
+        border: 1px solid var(--accent-medium);
+        background: #f8fcff;
+        color: var(--accent);
+        border-radius: 2px;
+      }
+
+      .process-strip {
+        border: 2px dashed var(--accent-medium);
+        background: #f8fcff;
+        padding: 0.45rem;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.35rem;
+      }
+
+      .process-step {
+        border: 1px solid #dbe4ef;
+        background: var(--paper);
+        padding: 0.4rem;
+        min-height: 60px;
+      }
+
+      .process-step h4 {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.52rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+        letter-spacing: 0.05em;
+      }
+
+      .process-step p {
+        font-size: 0.58rem;
+        line-height: 1.35;
+      }
+
+      .results-grid {
+        display: grid;
+        gap: 0.7rem;
+      }
+
+      .result-item {
+        background: var(--paper);
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+      }
+
+      .result-header {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--gray);
+        margin-bottom: 0.35rem;
+      }
+
+      .result-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--green);
+      }
+
+      .comparison-table {
+        font-size: 0.68rem;
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .comparison-table th {
+        font-family: "IBM Plex Mono", monospace;
+        text-align: left;
+        padding: 0.35rem;
+        background: var(--light-gray);
+        border-bottom: 2px solid var(--primary);
+        font-size: 0.58rem;
+        text-transform: uppercase;
+      }
+
+      .comparison-table td {
+        padding: 0.35rem;
+        border-bottom: 1px solid #e2e8f0;
+        line-height: 1.3;
+      }
+
+      .tag {
+        font-family: "IBM Plex Mono", monospace;
+        display: inline-block;
+        padding: 0.1rem 0.3rem;
+        border-radius: 2px;
+        font-size: 0.55rem;
+        margin-left: 0.25rem;
+        border: 1px solid #d6e4ea;
+        background: #f8fcff;
+        color: var(--accent);
+      }
+
+      .tech-stack {
+        display: flex;
+        gap: 0.42rem;
+        flex-wrap: wrap;
+        margin-top: 0.45rem;
+      }
+
+      .tech-badge {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.58rem;
+        padding: 0.22rem 0.45rem;
+        background: var(--primary);
+        color: var(--paper);
+        border-radius: 2px;
+      }
+
+      .pre-footer {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.6rem;
+        padding-top: 0.2rem;
+      }
+
+      .pre-footer-left {
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .pre-footer-right {
+        color: var(--gray);
+      }
+
+      .footer {
+        grid-column: 1 / -1;
+        border-top: 2px solid var(--accent);
+        padding-top: 0;
+        height: 0;
+      }
+
+      .decor-wave,
+      .decor-node {
+        position: absolute;
+        pointer-events: none;
+        opacity: 0.1;
+        z-index: 0;
+      }
+
+      .decor-wave {
+        left: -80px;
+        bottom: -70px;
+        width: 280px;
+        height: 280px;
+        border: 16px solid var(--accent);
+        border-radius: 40%;
+        transform: rotate(25deg);
+      }
+
+      .decor-node {
+        right: 6%;
+        top: 22%;
+        width: 90px;
+        height: 90px;
+        border: 10px solid var(--orange);
+        border-radius: 50%;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .section {
+        animation: fadeInUp 0.6s ease-out backwards;
+      }
+
+      .section:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .section:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .section:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .section:nth-child(4) {
+        animation-delay: 0.4s;
+      }
+      .section:nth-child(5) {
+        animation-delay: 0.5s;
+      }
+
+      .workflow,
+      .process-strip,
+      .badge {
+        animation: fadeInUp 0.75s ease-out backwards;
+      }
+
+      @media (max-width: 1200px) {
+        body {
+          overflow: auto;
+          height: auto;
+        }
+
+        .poster {
+          height: auto;
+          min-height: 50vh;
+        }
+      }
+
+      @page {
+        size: A3 landscape;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+      }
+
+      body {
+        background: #eef1f5;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 12px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .poster {
+        width: min(420mm, calc(100vw - 24px));
+        min-height: min(297mm, calc(100vh - 24px));
+        padding: 12mm 12mm 10mm;
+        background: #ffffff;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        gap: 6mm;
+        box-shadow: 0 14px 42px rgba(24, 26, 31, 0.14);
+        position: relative;
+      }
+
+      .header {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 2.2fr 1fr;
+        gap: 6mm;
+        align-items: start;
+        padding-bottom: 4mm;
+        border-bottom: 1.5px solid #111111;
+      }
+
+      .header-left {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: calc(17pt + 3px);
+        font-weight: 700;
+        color: #000000;
+        letter-spacing: 0.03em;
+        line-height: 1.05;
+        text-transform: uppercase;
+      }
+
+      .header-center {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1.5mm;
+      }
+
+      .header-center img {
+        width: 100%;
+        max-width: 152mm;
+        max-height: 34mm;
+        display: block;
+        object-fit: contain;
+      }
+
+      .header-right {
+        text-align: right;
+        color: #000000;
+        font-size: calc(9pt + 3px);
+        line-height: 1.28;
+      }
+
+      .header-right .label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: calc(7pt + 3px);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #000000;
+        margin-top: 1.4mm;
+      }
+
+      .header-right .value {
+        font-weight: 600;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.28fr 1fr;
+        grid-template-areas:
+          "intro architecture results"
+          "contribution architecture results"
+          "conclusion conclusion .";
+        gap: 5mm;
+        align-items: start;
+      }
+
+      .card {
+        background: #ffffff;
+        border: 1px solid #d6deea;
+        border-top: 3px solid var(--accent);
+        box-shadow: 0 1px 6px rgba(24, 26, 31, 0.06);
+        padding: 4mm;
+        overflow: hidden;
+      }
+
+      .card-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: calc(7.6pt + 3px);
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 2.2mm;
+      }
+
+      .card-text {
+        font-size: calc(9.2pt + 4px);
+        line-height: 1.5;
+        color: #17181b;
+      }
+
+      .intro {
+        grid-area: intro;
+      }
+
+      .intro .card-text {
+        font-size: calc(9.2pt + 6px);
+      }
+
+      .contribution {
+        grid-area: contribution;
+      }
+
+      .architecture {
+        grid-area: architecture;
+        display: flex;
+        flex-direction: column;
+        gap: 3mm;
+      }
+
+      .results {
+        grid-area: results;
+        display: flex;
+        flex-direction: column;
+        gap: 3mm;
+      }
+
+      .conclusion {
+        grid-area: conclusion;
+        grid-column: 1 / span 2;
+        display: grid;
+        grid-template-columns: 1.6fr 0.8fr;
+        gap: 5mm;
+        align-items: end;
+      }
+
+      .image-frame {
+        border: 1px solid #dce4ef;
+        background: #f9fbfd;
+        padding: 3mm;
+      }
+
+      .image-frame img {
+        width: 100%;
+        display: block;
+        object-fit: contain;
+      }
+
+      .architecture .image-frame img {
+        max-height: 134mm;
+      }
+
+      .results .image-frame img {
+        max-height: 98mm;
+      }
+
+      .bullet-list {
+        display: grid;
+        gap: 2mm;
+      }
+
+      .bullet-item {
+        display: grid;
+        grid-template-columns: 12mm 1fr;
+        gap: 2mm;
+        align-items: start;
+        font-size: calc(8.8pt + 4px);
+        line-height: 1.35;
+      }
+
+      .bullet-index {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: calc(7pt + 3px);
+        font-weight: 700;
+        color: #000000;
+        text-transform: uppercase;
+      }
+
+      .callout {
+        background: var(--accent-light);
+        border-left: 3px solid var(--accent);
+        padding: 3mm;
+        font-size: calc(8.5pt + 4px);
+        line-height: 1.42;
+        color: #1a1a1a;
+      }
+
+      .result-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3mm;
+      }
+
+      .result-tile {
+        background: var(--light-gray);
+        border: 1px solid #d6deea;
+        padding: 3mm;
+      }
+
+      .result-value {
+        font-size: calc(16pt + 3px);
+        font-weight: 700;
+        color: var(--green);
+        line-height: 1;
+      }
+
+      .result-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: calc(7pt + 3px);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #525966;
+        margin-top: 1mm;
+      }
+
+      .footer {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: end;
+        gap: 6mm;
+        border-top: 0;
+        padding-top: 0;
+        height: auto;
+        z-index: 2;
+      }
+
+      .footer-copy {
+        font-size: calc(8pt + 3px);
+        line-height: 1.35;
+        color: #000000;
+      }
+
+      .qr-box {
+        text-align: center;
+        flex: 0 0 auto;
+      }
+
+      .qr-box img {
+        width: 35mm;
+        height: 35mm;
+        display: block;
+      }
+
+      .qr-caption {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: calc(7pt + 3px);
+        color: #000000;
+        margin-top: 1.2mm;
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+          padding: 0;
+        }
+
+        .poster {
+          width: 420mm;
+          min-height: 297mm;
+          grid-template-rows: auto auto auto;
+          grid-template-columns: 1fr;
+          box-shadow: none;
+        }
+
+        .header {
+          border-bottom: none;
+        }
+
+        .content-grid {
+          align-items: start;
+        }
+
+        .footer {
+          position: absolute;
+          right: 150px;
+          bottom: 70px;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-sans">
+    <div class="poster">
+      <header class="header">
+        <div class="header-left">AVINYA 2026</div>
+        <div class="header-center">
+          <img src="header.png" alt="Meet2Map header" />
+        </div>
+        <div class="header-right">
+          <div class="label">Team Members</div>
+          <div class="value">Ankit Datta</div>
+          <div class="value">Aakarshit Saxena</div>
+          <div class="value">Aayush Shetty</div>
+          <div class="value">Evans Rumao</div>
+          <div class="label">IPD Guide</div>
+          <div class="value">Prof. Sindhu Nair</div>
+        </div>
+        <div
+          class="absolute top-[100px] text-center w-full text-2xl font-bold border-none!"
+        >
+          Department of Computer Engineering
+        </div>
+        <div
+          class="col-span-3 w-full text-center whitespace-nowrap font-semibold tracking-wide text-[18pt] leading-none mt-1 absolute title-div"
+        >
+          Meet2Map: AI-Powered Meeting Transcription to Mind Map System
+        </div>
+      </header>
+
+      <main class="content-grid">
+        <section class="card intro">
+          <div class="card-title">A. Introduction</div>
+          <div class="card-text">
+            <strong>Meet2Map</strong> turns live meeting dialogue into
+            structured meeting memory during the discussion itself. It captures
+            speech, generates transcripts, and converts ongoing conversation
+            into useful summaries for immediate and post-meeting review.
+          </div>
+          <div class="callout" style="margin-top: 3mm">
+            Problem: important decisions, action items, and discussion structure
+            are often lost when teams rely only on manual note-taking.
+          </div>
+        </section>
+
+        <section class="card contribution">
+          <div class="card-title">B. Contribution</div>
+          <div class="bullet-list">
+            <div class="bullet-item">
+              <div class="bullet-index">01</div>
+              <div>
+                Real-time speech transcription with timestamped chunks for fast
+                meeting capture and clear decision tracking.
+              </div>
+            </div>
+            <div class="bullet-item">
+              <div class="bullet-index">02</div>
+              <div>
+                Local summarization that keeps latency low while preserving the
+                context and continuity of key discussion points.
+              </div>
+            </div>
+            <div class="bullet-item">
+              <div class="bullet-index">03</div>
+              <div>
+                Mermaid-based mind map generation that converts the final notes
+                into a visual decision tree for fast understanding.
+              </div>
+            </div>
+            <div class="bullet-item">
+              <div class="bullet-index">04</div>
+              <div>
+                Export-ready meeting outputs that are easy to share, archive,
+                and reuse after the session ends.
+              </div>
+            </div>
+          </div>
+          <div class="callout" style="margin-top: 3mm">
+            Meet2Map keeps the note-taking loop inside the meeting, so teams can
+            focus on the discussion instead of rebuilding notes later.
+          </div>
+        </section>
+
+        <section class="card architecture">
+          <div class="card-title">C. Architecture</div>
+          <div class="card-text">
+            Audio is captured continuously, transcribed into rolling chunks,
+            summarized by a local LLM, and rendered into a visual mind map.
+          </div>
+          <div class="image-frame">
+            <img
+              src="coloredArchitecture.png"
+              alt="Meet2Map architecture diagram"
+            />
+          </div>
+          <div class="callout">
+            Flow: live audio in, timestamped transcript out, structured summary
+            in the middle, and a final meeting map at the end.
+          </div>
+        </section>
+
+        <section class="card results">
+          <div class="card-title">D. Results</div>
+          <div class="card-text">
+            Results show better recall, less manual documentation, and faster
+            follow-up review. Summaries plus visual mapping help teams revisit
+            key decisions without replaying full transcripts.
+          </div>
+          <div class="image-frame">
+            <img src="goodMindmap.png" alt="Meet2Map mind map result" />
+          </div>
+          <div class="result-grid">
+            <div class="result-tile">
+              <div class="result-value">High</div>
+              <div class="result-label">Recall</div>
+            </div>
+            <div class="result-tile">
+              <div class="result-value">Low</div>
+              <div class="result-label">Manual Notes</div>
+            </div>
+            <div class="result-tile">
+              <div class="result-value">Fast</div>
+              <div class="result-label">Review</div>
+            </div>
+            <div class="result-tile">
+              <div class="result-value">Clear</div>
+              <div class="result-label">Action Trace</div>
+            </div>
+          </div>
+          <div class="callout">
+            The final mind map gives teams a compact way to revisit decisions,
+            owners, and topic branches quickly during handoffs and planning.
+          </div>
+        </section>
+
+        <section class="card conclusion">
+          <div>
+            <div class="card-title">E. Conclusion</div>
+            <div class="card-text">
+              Meet2Map reduces meeting friction by automating capture,
+              summarization, and visualization. It preserves context and turns
+              discussions into actionable team memory.
+            </div>
+          </div>
+          <div class="callout">
+            Future work: speaker attribution, cross-meeting search, and
+            owner-based task tracking.
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="qr-box">
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=https%3A%2F%2Fgithub.com%2Fankit-281%2FAIMoM"
+            alt="GitHub QR code"
+          />
+          <div class="qr-caption">GitHub</div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
