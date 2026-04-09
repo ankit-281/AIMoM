@@ -690,12 +690,22 @@
       .content-grid {
         display: grid;
         grid-template-columns: 1fr 1.28fr 1fr;
+        grid-template-rows: auto auto;
         grid-template-areas:
-          "intro architecture results"
-          "contribution architecture results"
-          "conclusion conclusion .";
+          "left architecture results"
+          "left architecture conclusion";
         gap: 5mm;
         align-items: start;
+        height: 100%;
+      }
+
+      .left-stack {
+        grid-area: left;
+        display: flex;
+        flex-direction: column;
+        gap: 5mm;
+        align-self: stretch;
+        height: 100%;
       }
 
       .card {
@@ -733,6 +743,9 @@
 
       .contribution {
         grid-area: contribution;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
       }
 
       .architecture {
@@ -740,6 +753,8 @@
         display: flex;
         flex-direction: column;
         gap: 3mm;
+        align-self: stretch;
+        height: 100%;
       }
 
       .results {
@@ -751,11 +766,14 @@
 
       .conclusion {
         grid-area: conclusion;
-        grid-column: 1 / span 2;
+        grid-column: auto;
         display: grid;
         grid-template-columns: 1.6fr 0.8fr;
         gap: 5mm;
+        display: flex;
+        flex-direction: column;
         align-items: end;
+        align-self: start;
       }
 
       .image-frame {
@@ -863,8 +881,8 @@
       }
 
       .qr-box img {
-        width: 35mm;
-        height: 35mm;
+        width: 10mm;
+        height: 10mm;
         display: block;
       }
 
@@ -899,8 +917,8 @@
 
         .footer {
           position: absolute;
-          right: 150px;
-          bottom: 70px;
+          right: 20px;
+          bottom: 0px;
         }
       }
     </style>
@@ -908,7 +926,7 @@
   <body class="font-sans">
     <div class="poster">
       <header class="header">
-        <div class="header-left">AVINYA 2026</div>
+        <div class="header-left flex justify-center items-center pt-[50px]">AVINYA 2026</div>
         <div class="header-center">
           <img src="header.png" alt="Meet2Map header" />
         </div>
@@ -934,63 +952,75 @@
       </header>
 
       <main class="content-grid">
-        <section class="card intro">
-          <div class="card-title">A. Introduction</div>
-          <div class="card-text">
-            <strong>Meet2Map</strong> turns live meeting dialogue into
-            structured meeting memory during the discussion itself. It captures
-            speech, generates transcripts, and converts ongoing conversation
-            into useful summaries for immediate and post-meeting review.
-          </div>
-          <div class="callout" style="margin-top: 3mm">
-            Problem: important decisions, action items, and discussion structure
-            are often lost when teams rely only on manual note-taking.
-          </div>
-        </section>
+        <div class="left-stack">
+          <section class="card intro">
+            <div class="card-title">A. Introduction</div>
+            <div class="card-text">
+              <strong>Meet2Map</strong> turns live meeting dialogue into
+              structured meeting memory during the discussion itself. It
+              captures speech, generates transcripts, and converts ongoing
+              conversation into useful summaries for immediate and post-meeting
+              review. By organizing context live, it helps teams retain
+              decisions, ownership, and rationale while reducing confusion,
+              repetition, and post-meeting documentation delays.
+            </div>
+            <div class="callout" style="margin-top: 3mm">
+              Problem: important decisions, action items, and discussion
+              structure are often lost when teams rely only on manual
+              note-taking.
+            </div>
+          </section>
 
-        <section class="card contribution">
-          <div class="card-title">B. Contribution</div>
-          <div class="bullet-list">
-            <div class="bullet-item">
-              <div class="bullet-index">01</div>
-              <div>
-                Real-time speech transcription with timestamped chunks for fast
-                meeting capture and clear decision tracking.
+          <section class="card contribution">
+            <div class="card-title">B. Contribution</div>
+            <div class="bullet-list">
+              <div class="bullet-item">
+                <div class="bullet-index">01</div>
+                <div>
+                  Real-time speech transcription with timestamped chunks for
+                  fast meeting capture and clear decision tracking.
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-index">02</div>
+                <div>
+                  Local summarization that keeps latency low while preserving
+                  the context and continuity of key discussion points.
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-index">03</div>
+                <div>
+                  Mermaid-based mind map generation that converts the final
+                  notes into a visual decision tree for fast understanding.
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-index">04</div>
+                <div>
+                  Export-ready meeting outputs that are easy to share, archive,
+                  and reuse after the session ends.
+                </div>
               </div>
             </div>
-            <div class="bullet-item">
-              <div class="bullet-index">02</div>
-              <div>
-                Local summarization that keeps latency low while preserving the
-                context and continuity of key discussion points.
-              </div>
+            <div class="callout" style="margin-top: 3mm">
+              Meet2Map keeps the note-taking loop inside the meeting, so teams
+              can focus on the discussion instead of rebuilding notes later,
+              improving alignment during the call and reducing follow-up effort
+              after the meeting ends.
             </div>
-            <div class="bullet-item">
-              <div class="bullet-index">03</div>
-              <div>
-                Mermaid-based mind map generation that converts the final notes
-                into a visual decision tree for fast understanding.
-              </div>
-            </div>
-            <div class="bullet-item">
-              <div class="bullet-index">04</div>
-              <div>
-                Export-ready meeting outputs that are easy to share, archive,
-                and reuse after the session ends.
-              </div>
-            </div>
-          </div>
-          <div class="callout" style="margin-top: 3mm">
-            Meet2Map keeps the note-taking loop inside the meeting, so teams can
-            focus on the discussion instead of rebuilding notes later.
-          </div>
-        </section>
+          </section>
+        </div>
 
         <section class="card architecture">
           <div class="card-title">C. Architecture</div>
           <div class="card-text">
             Audio is captured continuously, transcribed into rolling chunks,
-            summarized by a local LLM, and rendered into a visual mind map.
+            summarized by a local LLM, and rendered into a visual mind map that
+            preserves topic flow and decision relationships for clearer
+            collaboration, traceability, alignment, and faster post-meeting
+            execution. This layered flow improves robustness, readability,
+            maintainability, and deployment flexibility.
           </div>
           <div class="image-frame">
             <img
@@ -1014,7 +1044,7 @@
           <div class="image-frame">
             <img src="goodMindmap.png" alt="Meet2Map mind map result" />
           </div>
-          <div class="result-grid">
+          <!-- <div class="result-grid">
             <div class="result-tile">
               <div class="result-value">High</div>
               <div class="result-label">Recall</div>
@@ -1031,7 +1061,7 @@
               <div class="result-value">Clear</div>
               <div class="result-label">Action Trace</div>
             </div>
-          </div>
+          </div> -->
           <div class="callout">
             The final mind map gives teams a compact way to revisit decisions,
             owners, and topic branches quickly during handoffs and planning.
@@ -1043,8 +1073,12 @@
             <div class="card-title">E. Conclusion</div>
             <div class="card-text">
               Meet2Map reduces meeting friction by automating capture,
-              summarization, and visualization. It preserves context and turns
-              discussions into actionable team memory.
+              summarization, and visualization. It preserves context and
+              converts discussions into clear, structured summaries and
+              intuitive mind maps. This helps teams quickly understand key
+              decisions, track action items, and revisit meetings with clarity.
+              Ultimately, Meet2Map improves collaboration and lets teams focus
+              more on discussion rather than manual note-taking.
             </div>
           </div>
           <div class="callout">
